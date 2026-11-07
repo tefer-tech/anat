@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ענת</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ענת">
+<meta name="theme-color" content="#010307">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&family=Rajdhani:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--c:#5FD4FF;--o:#FF9A3C;--g:#5CF2B0;--w:#F2FAFF;--mut:rgba(184,236,255,.62);--line:rgba(95,212,255,.3)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#010307;color:#E4F4FF;font-family:Heebo,'Arial Hebrew',system-ui,sans-serif;overflow:hidden}
+button,input,textarea,select{font:inherit}
+#root{position:relative;height:100%;display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:16px 16px 76px}
+body.single #root{grid-template-columns:1fr}
+body.single #data{display:none}
+body.dataonly #root{grid-template-columns:1fr}
+body.dataonly #anat,body.dataonly #bar{display:none}
+body.dataonly #root{padding-bottom:16px}
+.scr{position:relative;border-radius:12px;overflow:hidden;border:1px solid #1C2430;box-shadow:0 30px 80px rgba(0,0,0,.6);transform:perspective(2400px) rotateY(calc(var(--mx,0)*2.4deg)) rotateX(calc(var(--my,0)*-1.8deg));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+#anat{background:radial-gradient(circle at 50% 42%,#0A1F35 0%,#040B16 50%,#020509 85%)}
+#data{background:radial-gradient(circle at 50% 50%,#071628 0%,#030912 60%,#020509 90%)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(95,212,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(95,212,255,.05) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.aur{position:absolute;border-radius:50%;filter:blur(80px);opacity:.55;pointer-events:none;animation:aur 16s ease-in-out infinite alternate}
+@keyframes aur{0%{transform:translate(0,0) scale(1)}50%{transform:translate(14%,6%) scale(1.3)}100%{transform:translate(-8%,-5%) scale(.9)}}
+#head{position:absolute;inset:0;width:100%;height:100%}
+.rings{position:absolute;left:50%;top:42%;width:min(62vh,46vw);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none}
+body.single .rings{width:min(62vh,70vw)}
+.rings svg{position:absolute;inset:0;width:100%;height:100%}
+.r1{animation:spin 50s linear infinite}.r2{animation:spinr 30s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes spinr{to{transform:rotate(-360deg)}}
+.top{position:absolute;top:16px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center;z-index:3}
+.brand{font-family:Rajdhani,Heebo,sans-serif;font-weight:700;font-size:26px;letter-spacing:.06em}
+.status{display:flex;align-items:center;gap:8px;font-size:14px}
+.dot{width:8px;height:8px;border-radius:50%;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.subs{position:absolute;left:6%;right:6%;bottom:22px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;z-index:3}
+.q{font-size:15px;color:var(--mut);min-height:22px}
+.prev{font-size:17px;font-weight:300;color:rgba(230,244,255,.45);min-height:0}
+.cur{font-size:23px;line-height:1.4;color:#fff;text-shadow:0 0 22px rgba(95,212,255,.5);min-height:32px}
+.typing{animation:type var(--dur,2s) steps(60) both}
+@keyframes type{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0)}}
+.cost{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mut);direction:ltr}
+#fx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:5}
+/* data screen */
+.dwrap{position:absolute;inset:0;padding:22px 24px;display:flex;flex-direction:column;gap:16px}
+.idle{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(184,236,255,.4);font-size:16px;transition:opacity .4s}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;min-height:70px}
+.dtitle .code{font-size:13px;font-weight:500;color:var(--c)}
+.dtitle .t{font-weight:700;font-size:32px;line-height:1.15}
+.dtitle .s{font-size:14px;color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:55%}
+.chip{padding:6px 14px;border-radius:999px;border:1px solid rgba(95,212,255,.45);background:rgba(95,212,255,.08);font-size:13px;color:#CDEFFF}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.glass{position:relative;overflow:hidden;border-radius:14px;background:linear-gradient(160deg,rgba(120,220,255,.11),rgba(60,120,200,.04) 50%,rgba(95,212,255,.06));border:1px solid rgba(140,225,255,.3);box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 30px rgba(95,212,255,.10),inset 0 1px 0 rgba(255,255,255,.12)}
+.glass::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(200,240,255,.16) 48%,rgba(255,255,255,.06) 53%,transparent 66%);transform:translateX(-140%);animation:shine 6.5s ease-in-out infinite}
+@keyframes shine{0%,62%{transform:translateX(-140%)}100%{transform:translateX(140%)}}
+.kpi{padding:14px 18px}
+.kpi .l{font-size:14px;color:rgba(184,236,255,.7)}
+.kpi .v{font-family:Rajdhani,sans-serif;font-weight:700;font-size:44px;line-height:1.1;direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
+.kpi .n{font-size:12.5px;color:rgba(184,236,255,.55)}
+.lower{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px}
+.chart{padding:14px 18px;display:flex;flex-direction:column}
+.chart .h,.rows .h{display:flex;justify-content:space-between;font-size:14px;color:rgba(184,236,255,.7)}
+.bars{flex:1;min-height:120px;margin-top:12px;display:flex;align-items:flex-end;gap:12px;direction:ltr}
+.bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-width:0}
+.bar .val{font-family:Rajdhani,sans-serif;font-weight:600;font-size:14px;color:rgba(184,236,255,.8)}
+.bar .col{width:100%;max-width:44px;border-radius:8px 8px 3px 3px;transform-origin:bottom}
+.bar .lab{font-size:12px;color:rgba(184,236,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rows{padding:12px 18px;overflow:auto}
+.row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;padding:10px 6px;border-top:1px solid rgba(95,212,255,.14);font-size:15px;border-radius:6px}
+.row .a{font-family:'IBM Plex Mono',monospace;font-size:13px;color:rgba(184,236,255,.6)}
+.row .d{font-family:Rajdhani,Heebo,sans-serif;font-weight:600;font-size:17px;direction:ltr;text-align:left}
+.follow{display:flex;gap:10px;flex-wrap:wrap}
+.fchip{padding:8px 16px;border-radius:999px;border:1px dashed rgba(95,212,255,.45);font-size:14px;color:#9FDDF5;cursor:pointer;background:none}
+.hide{opacity:0}
+.in{animation:in 1s cubic-bezier(.2,.8,.2,1) both}
+@keyframes in{0%{opacity:0;clip-path:inset(0 0 0 100%);transform:translateY(16px) scale(.96);filter:blur(12px) brightness(2.6)}45%{opacity:1;clip-path:inset(0 0 0 0);transform:none;filter:blur(0) brightness(1.9) drop-shadow(6px 0 rgba(255,40,150,.65)) drop-shadow(-6px 0 rgba(40,215,255,.65))}72%{filter:brightness(1.25) drop-shadow(2px 0 rgba(255,40,150,.3)) drop-shadow(-2px 0 rgba(40,215,255,.3))}100%{opacity:1;clip-path:inset(0 0 0 0);transform:none;filter:none}}
+.out{animation:out .7s ease-in both}
+@keyframes out{0%{opacity:1}100%{opacity:0;filter:blur(12px) brightness(2);transform:translateX(120px) scale(.92)}}
+.grow{animation:grow .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{0%{transform:scaleY(0);filter:brightness(2.5)}70%{transform:scaleY(1.04)}100%{transform:scaleY(1);filter:none}}
+/* bottom bar */
+#bar{position:fixed;left:16px;right:16px;bottom:14px;height:50px;display:flex;align-items:center;gap:10px;z-index:6}
+.btn{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid rgba(95,212,255,.4);background:rgba(8,24,42,.75);color:#CDEFFF;cursor:pointer;white-space:nowrap}
+.btn:hover{background:rgba(95,212,255,.16)}
+.btn.on{background:rgba(95,212,255,.25);border-color:var(--c);color:#fff}
+.btn.rec{background:rgba(255,154,60,.25);border-color:var(--o);color:#fff}
+#ask{flex:1;min-width:120px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid rgba(95,212,255,.4);background:rgba(8,24,42,.75);color:#fff;outline:none}
+#ask:focus{border-color:var(--c)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+/* settings */
+#settings{position:fixed;inset:0;background:rgba(1,3,7,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:10}
+#settings.open{display:flex}
+.panel{width:min(720px,94vw);max-height:90vh;overflow:auto;padding:24px 28px;border-radius:16px;background:#071322;border:1px solid var(--line)}
+.panel h2{margin:0 0 4px;font-size:24px}
+.panel p.help{margin:0 0 16px;color:var(--mut);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:14px;color:#CDEFFF}
+.field small{color:var(--mut);font-size:12.5px}
+.field input,.field textarea,.field select{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#030a14;color:#fff}
+.field textarea{min-height:120px;direction:rtl}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.acts{display:flex;gap:10px;justify-content:flex-start;margin-top:8px;flex-wrap:wrap}
+#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:999px;background:rgba(255,154,60,.18);border:1px solid rgba(255,154,60,.6);color:#FFD9B5;font-size:14px;z-index:11;display:none;max-width:90vw;text-align:center}
+@media (max-width:820px){
+ #root{grid-template-columns:1fr;grid-template-rows:minmax(0,1.1fr) minmax(0,1fr);gap:10px;padding:max(10px,env(safe-area-inset-top)) 10px 150px}
+ body.single #root{grid-template-rows:1fr}
+ #bar{flex-wrap:wrap;height:auto;bottom:max(10px,env(safe-area-inset-bottom));left:10px;right:10px;gap:8px}
+ #ask{order:-1;flex-basis:100%}
+ #viewBtn,#dataWinBtn,.cost{display:none}
+ .btn{padding:0 14px;font-size:14px}
+ .rings{width:min(46vh,82vw)}
+ .cur{font-size:19px}.prev{font-size:14px}
+ .dwrap{padding:14px;gap:10px}.dtitle .t{font-size:22px}.kpi .v{font-size:30px}.kpis{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+ .lower{grid-template-columns:1fr}.chips{display:none}
+ .scr{transform:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div id="root">
+  <section id="anat" class="scr" aria-label="ענת">
+    <div class="aur" style="left:15%;top:15%;width:45%;height:50%;background:radial-gradient(circle,rgba(40,120,255,.55),transparent 70%)"></div>
+    <div class="aur" style="left:45%;top:40%;width:40%;height:45%;background:radial-gradient(circle,rgba(160,70,255,.45),transparent 70%);animation-delay:-7s"></div>
+    <div class="rings" aria-hidden="true">
+      <svg class="r1" viewBox="0 0 500 500" id="ticks"></svg>
+      <svg class="r2" viewBox="0 0 500 500" fill="none"><circle cx="250" cy="250" r="222" stroke="rgba(95,212,255,.18)"/><path d="M250 28 A222 222 0 0 1 448 150" stroke="#5FD4FF" stroke-width="2.5"/><path d="M80 390 A222 222 0 0 1 36 280" stroke="#FF9A3C" stroke-width="2.5"/></svg>
+    </div>
+    <canvas id="head" aria-hidden="true"></canvas>
+    <div class="top">
+      <span class="brand">ענת</span>
+      <span class="status" id="status"><span class="dot" id="sdot"></span><span id="stext">מתחילה…</span></span>
+    </div>
+    <div class="subs" aria-live="polite">
+      <div class="q" id="qline"></div>
+      <div class="prev" id="prev"></div>
+      <div class="cur" id="cur"></div>
+    </div>
+  </section>
+  <section id="data" class="scr" aria-label="מסך נתונים">
+    <div class="grid"></div>
+    <div class="aur" style="left:8%;top:8%;width:50%;height:55%;background:radial-gradient(circle,rgba(30,140,255,.35),transparent 70%)"></div>
+    <div class="aur" style="left:50%;top:42%;width:45%;height:50%;background:radial-gradient(circle,rgba(150,70,255,.30),transparent 70%);animation-delay:-9s"></div>
+    <div class="idle" id="idle">ממתינה לשאלה · תגיד "ענת"</div>
+    <div class="dwrap" id="dwrap"></div>
+  </section>
+</div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div id="bar">
+  <button class="btn" id="micBtn" type="button">🎙️ הקשבה: כבויה</button>
+  <button class="btn" id="wallBtn" type="button" title="מתמללת את מה שנאמר ושומרת ביומן היומי">זבוב על הקיר: כבוי</button>
+  <input id="ask" type="text" placeholder="או כתוב לענת כאן ולחץ אנטר…" aria-label="שאלה לענת">
+  <button class="btn" id="sumBtn" type="button">סיכום היום</button>
+  <button class="btn" id="viewBtn" type="button">פריסה: שני מסכים</button>
+  <button class="btn" id="dataWinBtn" type="button">פתח מסך נתונים בחלון נפרד</button>
+  <span class="cost" id="cost"></span>
+  <button class="btn" id="setBtn" type="button" aria-label="הגדרות">⚙️ הגדרות</button>
+</div>
+
+<div id="settings" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <div class="panel">
+    <h2 id="setTitle">הגדרות ענת</h2>
+    <p class="help">המפתחות נשמרים רק במחשב הזה, בדפדפן. הם לא נשלחים לשום מקום חוץ מ-Anthropic ומגוגל.</p>
+    <div class="field"><label for="kClaude">מפתח Claude API</label><input id="kClaude" type="password" autocomplete="off" placeholder="sk-ant-…"><small>מ-console.anthropic.com ← API Keys</small></div>
+    <div class="field"><label for="kGoogle">מפתח Google AI Studio (בשביל הקול)</label><input id="kGoogle" type="password" autocomplete="off" placeholder="AIza…"><small>מ-aistudio.google.com ← Get API key</small></div>
+    <div class="two">
+      <div class="field"><label for="model">מוח</label><select id="model"><option value="claude-haiku-5-5">Haiku 5.5 · מהיר וזול</option><option value="claude-sonnet-5-5">Sonnet 5.5 · חכם (מומלץ)</option><option value="claude-opus-5-5">Opus 5.5 · הכי חכם</option></select></div>
+      <div class="field"><label for="budget">תקרה חודשית ($)</label><input id="budget" type="number" min="1" step="1"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="voice">קול</label><input id="voice" type="text"><small>ברירת מחדל: Kira. אם לא זמין, עוברת אוטומטית ל-Kore.</small></div>
+      <div class="field"><label for="ttsModel">מודל קול של גוגל</label><input id="ttsModel" type="text"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="hear">שמיעה</label><select id="hear"><option value="auto">אוטומטי (מומלץ)</option><option value="chrome">Chrome · מהיר, רק במחשב</option><option value="gemini">Gemini · מדויק, גם בטלפון</option></select></div>
+      <div class="field"><label for="sttModel">מודל שמיעה של גוגל</label><input id="sttModel" type="text"></div>
+    </div>
+    <div class="field"><label for="style">סגנון דיבור</label><input id="style" type="text"></div>
+    <div class="field"><label for="niqqud">מילון הגייה (מילה=איך להגיד, שורה לכל מילה)</label><textarea id="niqqud"></textarea><small>כאן מתקנים מילים שהקול אומר לא נכון. למשל: תפר=תֶּפֶר</small></div>
+    <div class="field"><label for="about">מה ענת צריכה לדעת עליך ועל העסק</label><textarea id="about"></textarea></div>
+    <div class="acts">
+      <button class="btn on" id="saveSet" type="button">שמור</button>
+      <button class="btn" id="testVoice" type="button">בדיקת קול</button>
+      <button class="btn" id="closeSet" type="button">סגור</button>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const LS = {
+  get(k, d){ try { const v = localStorage.getItem('anat.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v){ try { localStorage.setItem('anat.' + k, JSON.stringify(v)); } catch (e) {} }
+};
+const DEF = {
+  model: 'claude-sonnet-5-5', budget: 100, hear: 'auto', sttModel: 'gemini-3.8-flash', voice: 'Kira', ttsModel: 'gemini-3.8-flash-tts',
+  style: 'Native Israeli Hebrew speaker, young woman, clear and warm, confident, fast natural pace like a sharp personal assistant',
+  niqqud: 'תפר=תֶּפֶר\nענת=עֲנָת\nמאיר=מֵאִיר\nבטיטו=בָּטִיטוֹ\nעוגן=עוֹגֶן\nננוש=נָנוּשׁ\nפריוריטי=פְּרָיוֹרִיטִי',
+  about: 'מאיר בטיטו, יזם ובעלים של קבוצת תפר בע״מ (TEFER GROUP), קבוצת חברות בתחומי פרסום, בנייה וציוד, אופנה (רשת ננוש), עיצוב פנים, לוגיסטיקה, פיננסים, משפטים, מזון (עוגן מרקט), שיער ויופי ועוד. רוב העסקים בשותפות 50/50. מנהל מערכת כרטיסי אשראי ותזרים קבוצתי, ומנה"ח בפריוריטי.'
+};
+const cfg = () => Object.assign({}, DEF, LS.get('cfg', {}));
+// prices per million tokens (input, output) — approximate, update from Anthropic's pricing page
+const PRICE = { 'claude-haiku-5-5': [0.10, 0.50], 'claude-sonnet-5-5': [2, 10], 'claude-opus-5-5': [4, 20] };
+
+const toast = (msg, ms) => { const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast._t); toast._t = setTimeout(() => { t.style.display = 'none'; }, ms || 4000); };
+
+// ---------- layout / windows ----------
+const params = new URLSearchParams(location.search);
+const DATA_ONLY = params.get('view') === 'data';
+if (DATA_ONLY) document.body.classList.add('dataonly');
+const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('anat') : null;
+let detached = false;
+$('dataWinBtn').onclick = () => {
+  window.open(location.pathname + '?view=data', 'anat-data', 'width=1280,height=760');
+  detached = true; document.body.classList.add('single'); $('viewBtn').textContent = 'פריסה: מסך אחד';
+  toast('גרור את החלון החדש למסך השני ולחץ F11 למסך מלא');
+};
+$('viewBtn').onclick = () => {
+  const s = document.body.classList.toggle('single');
+  $('viewBtn').textContent = s ? 'פריסה: מסך אחד' : 'פריסה: שני מסכים';
+};
+document.addEventListener('mousemove', (e) => {
+  document.documentElement.style.setProperty('--mx', ((e.clientX / innerWidth - .5) * 2).toFixed(3));
+  document.documentElement.style.setProperty('--my', ((e.clientY / innerHeight - .5) * 2).toFixed(3));
+});
+
+// ---------- ticks ----------
+(() => { const s = $('ticks'); let h = ''; for (let i = 0; i < 120; i++) { const a = i / 120 * Math.PI * 2, big = i % 6 === 0, r1 = 248, r2 = big ? 230 : 240; h += '<line x1="' + (250 + Math.cos(a) * r1).toFixed(1) + '" y1="' + (250 + Math.sin(a) * r1).toFixed(1) + '" x2="' + (250 + Math.cos(a) * r2).toFixed(1) + '" y2="' + (250 + Math.sin(a) * r2).toFixed(1) + '" stroke="' + (i > 84 && i < 98 ? '#FF9A3C' : 'rgba(95,212,255,.55)') + '" stroke-width="' + (big ? 2 : 1) + '"/>'; } s.innerHTML = h; })();
+
+// ---------- state ----------
+const S = { phase: 'idle', wakeAt: -1e9, amp: 0, pullUntil: 0 };
+const STATUS = { idle: ['ממתינה', '#5CF2B0'], wall: ['זבוב על הקיר · מקשיבה ברקע', '#5CF2B0'], wake: ['שמעתי את השם שלי', '#FF9A3C'], listen: ['מקשיבה לך', '#FF9A3C'], think: ['חושבת ומושכת נתונים', '#5FD4FF'], speak: ['עונה ומציגה', '#5FD4FF'], convo: ['בשיחה · מדבר איתי חופשי', '#5CF2B0'], armed: ['מחכה שתקרא לי "ענת"', '#5CF2B0'], off: ['המיקרופון כבוי · לחץ "הקשבה"', '#7A8A99'], error: ['יש בעיה', '#FF6B6B'] };
+function setPhase(p){ S.phase = p; const [t, c] = STATUS[p] || STATUS.idle; $('stext').textContent = t; $('status').style.color = c; $('sdot').style.background = c; $('sdot').style.boxShadow = '0 0 10px ' + c; }
+
+// ---------- sound fx ----------
+let AC = null;
+const ac = () => { try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); return AC; } catch (e) { return null; } };
+function tone(f1, f2, dur, type, vol, delay){ const a = ac(); if (!a) return; const t0 = a.currentTime + (delay || 0), o = a.createOscillator(), g = a.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f1, t0); o.frequency.exponentialRampToValueAtTime(f2, t0 + dur); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol || .06, t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur); o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0 + dur + .05); }
+function whoosh(up){ const a = ac(); if (!a) return; const len = a.sampleRate * .7, buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / len); const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(), t0 = a.currentTime; s.buffer = buf; f.type = 'bandpass'; f.Q.value = 4; f.frequency.setValueAtTime(up ? 400 : 2400, t0); f.frequency.exponentialRampToValueAtTime(up ? 2400 : 300, t0 + .7); g.gain.value = .1; s.connect(f); f.connect(g); g.connect(a.destination); s.start(); }
+const SFX = { wake(){ tone(660, 990, .18, 'sine', .08); tone(990, 1320, .25, 'sine', .06, .12); }, tick(){ tone(2200, 1800, .04, 'square', .02); }, pull(){ whoosh(true); }, build(){ tone(320, 640, .22, 'triangle', .06); }, bar(i){ tone(420 + i * 60, 460 + i * 60, .07, 'sine', .04); }, out(){ whoosh(false); }, end(){ tone(880, 520, .25, 'sine', .05); } };
+
+// ---------- particle head ----------
+const headCv = $('head'), hctx = headCv.getContext('2d');
+let cloud = [];
+(() => { let sd = 7; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+  for (let i = 0; i < 2100; i++) { const u = rnd() * Math.PI * 2, v = Math.acos(2 * rnd() - 1); let x = 92 * Math.sin(v) * Math.cos(u), y = -122 * Math.cos(v) - 25, z = 98 * Math.sin(v) * Math.sin(u); if (y > 10) { const k = 1 - (y - 10) / 240; x *= k; z *= k; } if (z > 0) z *= .92; const eye = (ex) => Math.hypot(x - ex, y + 28) < 15 && z > 60; if (eye(-34) || eye(34)) continue; cloud.push({ x, y, z, face: z > 35 && y > -95 && y < 70 }); }
+  for (let i = 0; i < 260; i++) { const th = rnd() * Math.PI * 2; cloud.push({ x: 40 * Math.cos(th), y: 85 + rnd() * 85, z: 34 * Math.sin(th), face: false }); }
+  for (let i = 0; i < 1300; i++) { const x = (rnd() * 2 - 1) * 270, s = Math.abs(x); const top = 168 + (s > 45 ? (s - 45) * .28 + Math.pow(s - 45, 2) * .0006 : 0); const dy = Math.pow(rnd(), 1.6) * 90; cloud.push({ x, y: top + dy, z: (rnd() - .5) * 110 * (1 - s / 340), face: false, fade: 1 - dy / 95 }); }
+})();
+function sizeCanvas(cv){ const r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } return dpr; }
+function drawHead(ts){
+  if (document.body.classList.contains('dataonly')) return;
+  const dpr = sizeCanvas(headCv), W = headCv.width, H = headCv.height, c = hctx;
+  const t = ts / 1000, ph = S.phase, cx = W / 2, cy = H * .42, sc = Math.min(W, H * 1.3) / 1100 * 1.0;
+  c.clearRect(0, 0, W, H);
+  const speaking = ph === 'speak', listening = ph === 'listen' || ph === 'wake';
+  let amp = speaking ? Math.max(.25, S.amp) : (listening ? .25 : .08);
+  const burst = 1 + .45 * Math.exp(-Math.max(0, ts - S.wakeAt) / 260);
+  const yaw = Math.sin(t * .4) * .32, pitch = Math.sin(t * .29) * .07, cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+  const R = 170 * sc * 2 + amp * 60 * dpr;
+  const g = c.createRadialGradient(cx, cy - 20 * sc * 2, 10, cx, cy - 20 * sc * 2, R); g.addColorStop(0, 'rgba(255,170,90,' + (.18 + amp * .35).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = g; c.fillRect(cx - R, cy - R, R * 2, R * 2);
+  c.globalCompositeOperation = 'lighter';
+  const k0 = sc * 2;
+  for (let i = 0; i < cloud.length; i++) {
+    const p = cloud[i]; const s = burst * (1 + (speaking && p.face ? amp * .05 * Math.sin(t * 10 + p.y * .07) : 0));
+    const x = p.x * s, y = p.y * s, z = p.z * s, xr = x * cyw - z * syw, zr = x * syw + z * cyw, yr = y * cp - zr * sp, zr2 = y * sp + zr * cp;
+    const k = 720 / (720 - zr2 * .9) * k0, px = cx + xr * k, py = cy + yr * k;
+    const depth = Math.min(1, Math.max(0, (zr2 + 130) / 260));
+    let a = .12 + depth * .7, r = 95, gg = 210, b = 255;
+    if (p.face && zr2 > 0) { const f = Math.min(1, zr2 / 55) * Math.min(1, .8 + amp * .5); r = 95 + 160 * f; gg = 210 - 60 * f; b = 255 - 185 * f; a += f * .4; }
+    if (listening) { const w = Math.sin(p.y * .05 - t * 9); if (w > .82) { r = 255; gg = 160; b = 70; a += .35; } }
+    if (p.fade !== undefined) a *= Math.max(.05, p.fade);
+    const sz = (depth > .7 ? 2 : 1.4) * dpr * .9;
+    c.fillStyle = 'rgba(' + (r | 0) + ',' + (gg | 0) + ',' + (b | 0) + ',' + Math.min(1, a).toFixed(2) + ')'; c.fillRect(px, py, sz, sz);
+  }
+  c.globalCompositeOperation = 'source-over';
+}
+
+// ---------- cross-screen particles ----------
+const fxCv = $('fx'), fctx = fxCv.getContext('2d'); let FX = [];
+function corePos(){ const r = $('anat').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * .36]; }
+function spawn(x0, y0, x1, y1, delay, dur, col){ const now = performance.now(); FX.push({ x0, y0, x1, y1, cx: (x0 + x1) / 2 + (Math.random() - .5) * 300, cy: Math.min(y0, y1) - 80 - Math.random() * 160, t0: now + delay, dur, col, sz: 1 + Math.random() * 2.2 }); }
+function visibleData(){ return !DATA_ONLY && !document.body.classList.contains('single'); }
+function spawnTo(el){ if (!visibleData() || !el) return; const r = el.getBoundingClientRect(), [ox, oy] = corePos(); for (let i = 0; i < 80; i++) spawn(ox + (Math.random() - .5) * 60, oy + (Math.random() - .5) * 60, r.left + Math.random() * r.width, r.top + Math.random() * r.height, Math.random() * 260, 520 + Math.random() * 300, Math.random() < .2 ? '255,170,90' : '120,225,255'); }
+function spawnFrom(el){ if (!visibleData() || !el) return; const r = el.getBoundingClientRect(), [ox, oy] = corePos(); for (let i = 0; i < 40; i++) spawn(r.left + Math.random() * r.width, r.top + Math.random() * r.height, ox + (Math.random() - .5) * 40, oy + (Math.random() - .5) * 40, Math.random() * 200, 700 + Math.random() * 400, Math.random() < .25 ? '255,170,90' : '140,230,255'); }
+function drawFx(){
+  const dpr = sizeCanvas(fxCv), c = fctx, now = performance.now();
+  if (now < S.pullUntil && visibleData()) { const r = $('data').getBoundingClientRect(), [ox, oy] = corePos(); for (let i = 0; i < 5; i++) spawn(r.left + Math.random() * r.width, r.top + Math.random() * r.height, ox + (Math.random() - .5) * 40, oy + (Math.random() - .5) * 40, 0, 650 + Math.random() * 450, Math.random() < .3 ? '255,170,90' : '120,225,255'); }
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, fxCv.width, fxCv.height); if (!FX.length) return;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.globalCompositeOperation = 'lighter'; c.lineCap = 'round';
+  const pos = (p, e) => { const u = 1 - e; return [u * u * p.x0 + 2 * u * e * p.cx + e * e * p.x1, u * u * p.y0 + 2 * u * e * p.cy + e * e * p.y1]; };
+  const keep = [];
+  for (const p of FX) { const k = (now - p.t0) / p.dur; if (k < 0) { keep.push(p); continue; } if (k > 1.35) continue; keep.push(p);
+    if (k >= 1) { const f = 1 - (k - 1) / .35; c.fillStyle = 'rgba(' + p.col + ',' + (f * .9).toFixed(2) + ')'; c.beginPath(); c.arc(p.x1, p.y1, p.sz * (1 + (1 - f) * 3), 0, 6.283); c.fill(); continue; }
+    const e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2, e0 = Math.max(0, e - .09), [x, y] = pos(p, e), [xa, ya] = pos(p, e0);
+    const gr = c.createLinearGradient(xa, ya, x, y); gr.addColorStop(0, 'rgba(' + p.col + ',0)'); gr.addColorStop(1, 'rgba(' + p.col + ',.95)'); c.strokeStyle = gr; c.lineWidth = p.sz; c.beginPath(); c.moveTo(xa, ya); c.lineTo(x, y); c.stroke(); }
+  FX = keep; c.globalCompositeOperation = 'source-over';
+}
+(function loop(ts){ try { drawHead(ts); drawFx(); } catch (e) {} requestAnimationFrame(loop); })(0);
+
+// ---------- data screen ----------
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+const TONE = { good: '#5CF2B0', warn: '#FF9A3C', bad: '#FF6B6B', info: '#5FD4FF', neutral: '#F2FAFF' };
+const toneCol = (t) => TONE[t] || TONE.neutral;
+function renderView(v){
+  const d = $('dwrap'); $('idle').style.opacity = v ? 0 : 1;
+  if (!v) { d.innerHTML = ''; return; }
+  let h = '<div class="dhead"><div class="dtitle hide" data-p="title"><div class="code">' + esc(v.code || '') + '</div><div class="t">' + esc(v.title || '') + '</div><div class="s">' + esc(v.subtitle || '') + '</div></div><div class="chips">' + (v.chips || []).map((c) => '<span class="chip hide" data-p="chip">' + esc(c) + '</span>').join('') + '</div></div>';
+  if (v.kpis && v.kpis.length) h += '<div class="kpis">' + v.kpis.map((k, i) => '<div class="glass kpi hide" data-p="k' + i + '"><div class="l">' + esc(k.label) + '</div><div class="v" style="color:' + toneCol(k.tone) + ';text-shadow:0 0 22px ' + toneCol(k.tone) + '88" data-num="' + esc(k.value) + '" data-unit="' + esc(k.unit || '') + '">0</div><div class="n">' + esc(k.note || '') + '</div></div>').join('') + '</div>';
+  const hasChart = v.chart && v.chart.points && v.chart.points.length, hasRows = v.rows && v.rows.items && v.rows.items.length;
+  if (hasChart || hasRows) {
+    h += '<div class="lower" style="' + (hasChart && hasRows ? '' : 'grid-template-columns:1fr') + '">';
+    if (hasRows) h += '<div class="glass rows hide" data-p="rows"><div class="h"><span>' + esc(v.rows.title || '') + '</span></div>' + v.rows.items.map((r) => '<div class="row"><span class="a">' + esc(r.a) + '</span><span>' + esc(r.b) + '</span><span class="d" style="color:' + toneCol(r.tone) + '">' + esc(r.d) + '</span></div>').join('') + '</div>';
+    if (hasChart) { const pts = v.chart.points, max = Math.max(...pts.map((p) => Number(p.value) || 0), 1); h += '<div class="glass chart hide" data-p="chart"><div class="h"><span>' + esc(v.chart.title || '') + '</span><span>' + esc(v.chart.unit || '') + '</span></div><div class="bars">' + pts.map((p) => { const val = Number(p.value) || 0, peak = val === max, col = peak ? '#FF9A3C' : '#5FD4FF'; return '<div class="bar"><span class="val hide">' + esc(Number(val).toLocaleString('en-US')) + '</span><div class="col hide" style="height:' + Math.max(3, val / max * 100) + '%;background:linear-gradient(180deg,' + col + ',rgba(95,212,255,.06));box-shadow:0 0 ' + (peak ? 26 : 14) + 'px ' + col + '"></div><span class="lab">' + esc(p.label) + '</span></div>'; }).join('') + '</div></div>'; }
+    h += '</div>';
+  }
+  if (v.follow && v.follow.length) h += '<div class="follow hide" data-p="follow">' + v.follow.map((f) => '<button type="button" class="fchip">' + esc(f) + '</button>').join('') + '</div>';
+  d.innerHTML = h;
+  d.querySelectorAll('.fchip').forEach((b) => { b.onclick = () => ask(b.textContent); });
+}
+function countUp(el){ const raw = String(el.dataset.num || '0'), unit = el.dataset.unit ? ' ' + el.dataset.unit : ''; const target = parseFloat(raw.replace(/[^\d.\-]/g, '')); if (!isFinite(target)) { el.textContent = raw + unit; return; }
+  const dec = (raw.split('.')[1] || '').length, t0 = performance.now(), dur = 1400; const fmt = (x) => x.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  (function f(){ const k = Math.min(1, (performance.now() - t0) / dur); el.textContent = (k < .4 ? fmt(target).replace(/\d/g, () => Math.floor(Math.random() * 10)) : fmt(target * (1 - Math.pow(1 - k, 3)))) + unit; if (k < 1) requestAnimationFrame(f); else el.textContent = fmt(target) + unit; })(); }
+function revealPart(key){
+  const d = $('dwrap'); const els = key === 'chip' ? d.querySelectorAll('[data-p="chip"]') : d.querySelectorAll('[data-p="' + key + '"]');
+  els.forEach((el, i) => {
+    if (!el.classList.contains('hide')) return;
+    spawnTo(el);
+    setTimeout(() => {
+      el.classList.remove('hide'); el.classList.add('in'); SFX.build();
+      if (key[0] === 'k') { const n = el.querySelector('.v'); if (n) { countUp(n); setTimeout(SFX.tick, 200); setTimeout(SFX.tick, 700); } }
+      if (key === 'chart') el.querySelectorAll('.bar').forEach((b, j) => setTimeout(() => { const c = b.querySelector('.col'), v = b.querySelector('.val'); c.classList.remove('hide'); c.classList.add('grow'); v.classList.remove('hide'); v.classList.add('in'); SFX.bar(j); }, 200 + j * 90));
+    }, 420 + i * 120);
+  });
+}
+function dissolveAll(){ const d = $('dwrap'); const parts = d.querySelectorAll('[data-p]:not(.hide)'); if (!parts.length) return Promise.resolve(); SFX.out(); parts.forEach((el) => { spawnFrom(el); el.classList.remove('in'); el.classList.add('out'); }); return new Promise((r) => setTimeout(r, 750)); }
+// sync to detached data window
+function send(msg){ if (bc) bc.postMessage(msg); }
+if (bc) bc.onmessage = (e) => { const m = e.data || {}; if (!DATA_ONLY && m.type === 'hello' && m.id !== INST) { try { stopRec(); } catch (x) {} micOn = false; talk = false; try { updMic(); } catch (x) {} document.body.innerHTML = '<div style="height:100vh;display:flex;align-items:center;justify-content:center;font-size:22px;color:#9FDDF5;font-family:Heebo,sans-serif;text-align:center;padding:24px">ענת נפתחה בחלון אחר.<br>אפשר לסגור את החלון הזה.</div>'; return; } if (!DATA_ONLY) return; if (m.type === 'view') renderView(m.view); if (m.type === 'reveal') revealPart(m.key); if (m.type === 'dissolve') dissolveAll(); };
+const INST = Math.random().toString(36).slice(2);
+if (!DATA_ONLY && bc) setTimeout(() => bc.postMessage({ type: 'hello', id: INST }), 50);
+const showView = (v) => { renderView(v); send({ type: 'view', view: v }); };
+const showPart = (k) => { revealPart(k); send({ type: 'reveal', key: k }); };
+const clearView = async () => { send({ type: 'dissolve' }); await dissolveAll(); };
+
+// ---------- subtitles ----------
+function setLine(text, prev){ const c = $('cur'); $('prev').textContent = prev || ''; c.classList.remove('typing'); void c.offsetWidth; c.textContent = text || ''; if (text) { c.style.setProperty('--dur', Math.max(1.2, text.length * .055) + 's'); c.classList.add('typing'); } }
+
+// ---------- TTS (Google) with pronunciation dictionary ----------
+function applyNiqqud(text){ const lines = String(cfg().niqqud || '').split('\n').map((l) => l.split('=')).filter((p) => p.length === 2 && p[0].trim() && p[1].trim()); let out = text; lines.forEach(([w, r]) => { const re = new RegExp('(^|[^\\u0590-\\u05FF])([והבכלמש]?)' + w.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=$|[^\\u0590-\\u05FF])', 'g'); out = out.replace(re, (m, a, pre) => a + pre + r.trim()); }); return out; }
+let voiceOK = null;
+async function ttsGoogle(text){
+  const c = cfg(); if (!c.kGoogle) throw new Error('no-google-key');
+  const voices = voiceOK ? [voiceOK] : [c.voice || 'Kira', 'Kore'];
+  let lastErr = null;
+  for (const v of voices) {
+    try {
+      const body = { contents: [{ role: 'user', parts: [{ text: applyNiqqud(text), speech_metadata: { style: c.style } }] }], generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { voice: v } } } };
+      let r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(c.ttsModel) + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': c.kGoogle }, body: JSON.stringify(body) });
+      if (!r.ok) { // older request shape fallback
+        const body2 = { contents: [{ parts: [{ text: 'Say in Hebrew, ' + c.style + ': ' + applyNiqqud(text) }] }], generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: v } } } } };
+        r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(c.ttsModel) + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': c.kGoogle }, body: JSON.stringify(body2) });
+      }
+      if (!r.ok) { lastErr = new Error('google ' + r.status + ' ' + (await r.text()).slice(0, 200)); continue; }
+      const j = await r.json(); const part = (((j.candidates || [])[0] || {}).content || {}).parts || []; const inl = part.find((p) => p.inlineData || p.inline_data); if (!inl) { lastErr = new Error('no audio'); continue; }
+      const data = (inl.inlineData || inl.inline_data); voiceOK = v;
+      return { b64: data.data, mime: data.mimeType || data.mime_type || '' };
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('tts failed');
+}
+function b64ToBuf(b64){ const s = atob(b64), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u.buffer; }
+async function audioFrom(res){ const a = ac(); const buf = b64ToBuf(res.b64); const isWav = /wav/i.test(res.mime) || new TextDecoder().decode(new Uint8Array(buf.slice(0, 4))) === 'RIFF';
+  if (isWav) return await a.decodeAudioData(buf.slice(0));
+  const pcm = new Int16Array(buf), rate = (/rate=(\d+)/.exec(res.mime) || [0, 24000])[1] * 1, ab = a.createBuffer(1, pcm.length, rate), ch = ab.getChannelData(0); for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768; return ab; }
+let curSrc = null;
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { try { curSrc && curSrc.stop(); } catch (x) {} try { speechSynthesis.cancel(); } catch (x) {} } });
+function playBuffer(ab){ return new Promise((resolve) => { const a = ac(), src = a.createBufferSource(); curSrc = src; const an = a.createAnalyser(); an.fftSize = 512; src.buffer = ab; src.connect(an); an.connect(a.destination); const arr = new Uint8Array(an.fftSize); let live = true; (function meter(){ if (!live) return; an.getByteTimeDomainData(arr); let s = 0; for (let i = 0; i < arr.length; i++) { const v = (arr[i] - 128) / 128; s += v * v; } S.amp = Math.min(1, Math.sqrt(s / arr.length) * 4); requestAnimationFrame(meter); })(); src.onended = () => { live = false; S.amp = 0; resolve(); }; src.start(); }); }
+function speakBrowser(text){ return new Promise((resolve) => { try { const he = speechSynthesis.getVoices().find((v) => /^(he|iw)/i.test(v.lang)); if (!he) return setTimeout(resolve, Math.max(1500, text.length * 55)); const u = new SpeechSynthesisUtterance(applyNiqqud(text)); u.voice = he; u.lang = he.lang; u.rate = 1.1; u.onend = resolve; u.onerror = resolve; speechSynthesis.speak(u); setTimeout(resolve, text.length * 90 + 4000); } catch (e) { setTimeout(resolve, 1500); } }); }
+let warnedTTS = false;
+async function prepareLine(text){ try { const res = await ttsGoogle(text); return { ab: await audioFrom(res) }; } catch (e) { if (!warnedTTS) { warnedTTS = true; toast('הקול של גוגל לא זמין (' + String(e.message || e).slice(0, 80) + '). עוברת לקול הדפדפן.', 7000); console.warn(e); } return { fallback: true }; } }
+
+// ---------- brain (Claude) ----------
+const SYS = () => {
+  const c = cfg(), mem = LS.get('memory', []), day = todayLog();
+  return 'את ענת, העוזרת האישית הקולית של מאיר. את מדברת עברית ישראלית טבעית, בגוף נקבה, קצר, חד וחם, כמו עוזרת אישית מעולה. אסור לך להמציא מספרים או עובדות: משתמשים רק במה שמאיר אמר, במה שכתוב במאגר הידע למטה, או ביומן של היום. אם אין לך נתונים, אמרי את זה בפשטות ושאלי שאלה אחת קצרה. עדיין אין לך חיבור למערכות של תפר (כרטיסי אשראי, תזרים, פריוריטי); אם מבקשים מהן נתונים, אמרי שהחיבור יגיע בשלב הבא.\n\n'
+  + 'על מאיר והעסק:\n' + c.about + '\n\n'
+  + 'מאגר הידע (דברים שמאיר ביקש לזכור):\n' + (mem.length ? mem.map((m) => '- ' + m).join('\n') : '(ריק)') + '\n\n'
+  + 'יומן היום (תמלול מה שנשמע ברקע, אם הופעל):\n' + (day.length ? day.slice(-80).map((l) => l.t + ' ' + l.x).join('\n') : '(ריק)') + '\n\n'
+  + 'החזירי תמיד JSON תקין בלבד, בלי שום טקסט מסביב, במבנה:\n'
+  + '{"lines":["משפט קצר 1","משפט 2"],"view":null או {"code":"שם קצר של הנושא","title":"כותרת","subtitle":"תת-כותרת","chips":["מקור…"],"kpis":[{"label":"…","value":"84600","unit":"₪","note":"…","tone":"neutral|good|warn|bad|info"}],"chart":{"title":"…","unit":"…","points":[{"label":"ינו","value":6200}]},"rows":{"title":"…","items":[{"a":"28.10","b":"תיאור","d":"4,900 ₪","tone":"neutral"}]},"follow":["שאלת המשך קצרה"]},"reveal":[["title","k0"],["chart"],["k1","rows"]],"remember":["עובדה חדשה לשמור, רק אם מאיר ביקש לזכור"],"end":false}\n'
+  + 'כללים: lines הם מה שתגידי בקול, 1 עד 4 משפטים קצרים, מספרים בספרות. reveal הוא רשימה באורך של lines: לכל משפט, אילו חלקים במסך נבנים כשאת אומרת אותו (title, chip, k0..k5, chart, rows, follow). הציגי view רק כשיש נתונים אמיתיים להראות; אחרת view=null ו-reveal רשימות ריקות. end=true רק כשמאיר מסיים את השיחה ("סיימנו", "תודה, זהו").';
+};
+let history = LS.get('history', []);
+function costAdd(model, usage){ if (!usage) return; const p = PRICE[model] || [3, 15]; const usd = (usage.input_tokens || 0) / 1e6 * p[0] + (usage.output_tokens || 0) / 1e6 * p[1]; const key = new Date().toISOString().slice(0, 7), m = LS.get('cost', {}); m[key] = (m[key] || 0) + usd; LS.set('cost', m); showCost(); }
+function monthCost(){ return (LS.get('cost', {})[new Date().toISOString().slice(0, 7)] || 0); }
+function showCost(){ $('cost').textContent = monthCost().toFixed(2) + '$ / ' + cfg().budget + '$'; }
+showCost();
+async function brain(q){
+  const c = cfg(); if (!c.kClaude) throw new Error('חסר מפתח Claude בהגדרות');
+  if (monthCost() >= Number(c.budget || 100)) throw new Error('הגעת לתקרה החודשית שהגדרת');
+  const model = monthCost() >= Number(c.budget || 100) * .9 ? 'claude-haiku-5-5' : c.model;
+  const msgs = history.slice(-12).concat([{ role: 'user', content: q }]);
+  const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': c.kClaude, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model, max_tokens: 1500, system: SYS(), messages: msgs }) });
+  if (!r.ok) throw new Error('Claude ' + r.status + ': ' + (await r.text()).slice(0, 180));
+  const j = await r.json(); costAdd(model, j.usage);
+  const txt = (j.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+  let out; try { out = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1)); } catch (e) { out = { lines: [txt.trim()], view: null, reveal: [] }; }
+  history.push({ role: 'user', content: q }, { role: 'assistant', content: txt }); history = history.slice(-24); LS.set('history', history);
+  if (Array.isArray(out.remember) && out.remember.length) { const mem = LS.get('memory', []); out.remember.forEach((m) => { if (m && mem.indexOf(m) < 0) mem.push(m); }); LS.set('memory', mem.slice(-200)); toast('נשמר במאגר: ' + out.remember.join(' · ')); }
+  return out;
+}
+
+// ---------- conversation flow ----------
+let busy = false, talk = false;
+function restPhase(){ if (!micOn) return 'off'; return talk ? 'convo' : 'armed'; }
+async function ask(q){
+  q = String(q || '').trim(); if (!q || busy) return; busy = true; ac();
+  stopListen(false); $('qline').textContent = 'מאיר · ' + q; setLine('');
+  setPhase('think'); S.pullUntil = performance.now() + 1500; SFX.pull();
+  try {
+    const [out] = await Promise.all([brain(q), clearView()]);
+    const lines = (out.lines || []).filter(Boolean).slice(0, 5);
+    if (out.view) showView(out.view); else showView(null);
+    const reveal = out.reveal || [];
+    let next = lines.length ? prepareLine(lines[0]) : null;
+    setPhase('speak');
+    for (let i = 0; i < lines.length; i++) {
+      const prep = await next; next = i + 1 < lines.length ? prepareLine(lines[i + 1]) : null;
+      setLine(lines[i], i ? lines[i - 1] : '');
+      (reveal[i] || []).forEach((k, j) => setTimeout(() => showPart(k), j * 250));
+      if (i === 0 && out.view) setTimeout(() => showPart('chip'), 300);
+      if (prep && prep.ab) await playBuffer(prep.ab); else await speakBrowser(lines[i]);
+    }
+    if (out.view) { showPart('follow'); ['title', 'k0', 'k1', 'k2', 'k3', 'k4', 'k5', 'chart', 'rows'].forEach((k) => showPart(k)); }
+    if (out.end) { talk = false; SFX.end(); }
+  } catch (e) {
+    setPhase('error'); setLine(String(e.message || e)); toast(String(e.message || e), 8000); console.error(e);
+  }
+  busy = false; setPhase(restPhase());
+  if (micOn) startListen();
+}
+$('ask').addEventListener('keydown', (e) => { if (e.key === 'Enter') { const v = $('ask').value; $('ask').value = ''; ask(v); } });
+
+// ---------- speech recognition ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, micOn = false, wall = false, capturing = false, capBuf = '', capTimer = null;
+const WAKE = /(^|[\s,.!?])(ענת|אנת|ענט|אנט|הענת)(?=$|[\s,.!?])/;
+function todayKey(){ return 'log.' + new Date().toISOString().slice(0, 10); }
+function todayLog(){ return LS.get(todayKey(), []); }
+function logLine(x){ if (!wall) return; const l = todayLog(); l.push({ t: new Date().toTimeString().slice(0, 5), x }); LS.set(todayKey(), l.slice(-3000)); }
+function finishCapture(){ capturing = false; clearTimeout(capTimer); const q = capBuf.trim(); capBuf = ''; if (q.length > 1) ask(q); else setPhase(restPhase()); }
+function handleFinal(txt, complete){
+  txt = String(txt || '').trim(); if (!txt) return;
+  const gap = complete ? 50 : 1100;
+  if (capturing) { capBuf += ' ' + txt; clearTimeout(capTimer); capTimer = setTimeout(finishCapture, gap); return; }
+  const m = WAKE.exec(txt);
+  if (m || talk) {
+    const after = m ? txt.slice(m.index + m[0].length).replace(/^[\s,]+/, '') : txt;
+    if (/^(סיימנו|סיימנו תודה|תודה זהו|זהו תודה|ביי|זהו)[.!]?$/.test(after.trim())) { talk = false; SFX.end(); setLine('סיימנו. אני ברקע, תקרא לי "ענת" כשצריך.'); setPhase(restPhase()); return; }
+    if (m && !talk) { S.wakeAt = performance.now(); SFX.wake(); }
+    talk = true;
+    setPhase('listen'); capturing = true; capBuf = after; $('qline').textContent = 'מאיר · ' + after;
+    clearTimeout(capTimer); capTimer = setTimeout(finishCapture, after ? gap : 6000);
+  } else logLine(txt);
+}
+// ---------- hearing via Gemini (works on iPhone too) ----------
+const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function hearMode(){ const h = cfg().hear || 'auto'; if (h === 'auto') return (SR && !IOS) ? 'chrome' : 'gemini'; return h === 'chrome' && !SR ? 'gemini' : h; }
+const GM = { stream: null, src: null, proc: null, chunks: [], pre: [], speaking: false, lastVoice: 0, startT: 0, floor: 0.008, rate: 48000, queue: Promise.resolve() };
+function encodeWav(chunks, inRate){ const outRate = 16000, ratio = inRate / outRate; let total = 0; chunks.forEach((c) => { total += c.length; }); const all = new Float32Array(total); let o = 0; chunks.forEach((c) => { all.set(c, o); o += c.length; }); const n = Math.floor(total / ratio), pcm = new Int16Array(n); for (let i = 0; i < n; i++) { const a = Math.floor(i * ratio), b = Math.min(total, Math.floor((i + 1) * ratio)); let sum = 0; for (let j = a; j < b; j++) sum += all[j]; const v = Math.max(-1, Math.min(1, sum / Math.max(1, b - a))); pcm[i] = v < 0 ? v * 32768 : v * 32767; } const buf = new ArrayBuffer(44 + n * 2), dv = new DataView(buf); const w = (p, t) => { for (let i = 0; i < t.length; i++) dv.setUint8(p + i, t.charCodeAt(i)); }; w(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, outRate, true); dv.setUint32(28, outRate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data'); dv.setUint32(40, n * 2, true); new Int16Array(buf, 44).set(pcm); return buf; }
+function bufToB64(buf){ const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+async function transcribe(wav){
+  const c = cfg(); if (!c.kGoogle) throw new Error('חסר מפתח Google בהגדרות');
+  const models = [c.sttModel || 'gemini-3.8-flash', 'gemini-2.5-flash'];
+  let last = null;
+  for (const m of models) {
+    const body = { contents: [{ role: 'user', parts: [{ text: 'תמלל במדויק את הדיבור בהקלטה. הדובר מדבר עברית (לפעמים עם מילים באנגלית). החזר רק את הטקסט המתומלל, בלי הסברים ובלי מירכאות. אם אין דיבור ברור, החזר שורה ריקה. שמות שעשויים להופיע: ענת, מאיר, תפר, ננוש, עוגן, פריוריטי.' }, { inline_data: { mime_type: 'audio/wav', data: bufToB64(wav) } }] }], generationConfig: { temperature: 0 } };
+    try {
+      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(m) + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': c.kGoogle }, body: JSON.stringify(body) });
+      if (!r.ok) { last = new Error('שמיעה ' + r.status + ': ' + (await r.text()).slice(0, 120)); continue; }
+      const j = await r.json(); return ((((j.candidates || [])[0] || {}).content || {}).parts || []).map((p) => p.text || '').join('').trim();
+    } catch (e) { last = e; }
+  }
+  throw last || new Error('שמיעה נכשלה');
+}
+function gemUtterance(chunks){
+  const wav = encodeWav(chunks, GM.rate);
+  GM.queue = GM.queue.then(async () => {
+    if (!micOn) return;
+    $('qline').textContent = 'מתמללת…';
+    try { const t = await transcribe(wav); if (t && t.replace(/[\s.…]/g, '').length > 1) handleFinal(t, true); else if (!capturing) $('qline').textContent = ''; }
+    catch (e) { toast(String(e.message || e), 7000); }
+  });
+}
+async function startGem(){
+  if (GM.stream) { GM.paused = false; return; }
+  try {
+    GM.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+  } catch (e) { toast('אין גישה למיקרופון. צריך לאשר מיקרופון לאתר הזה.', 9000); micOn = false; updMic(); return; }
+  const a = ac(); GM.rate = a.sampleRate; GM.src = a.createMediaStreamSource(GM.stream); GM.proc = a.createScriptProcessor(4096, 1, 1);
+  const mute = a.createGain(); mute.gain.value = 0; GM.src.connect(GM.proc); GM.proc.connect(mute); mute.connect(a.destination);
+  GM.proc.onaudioprocess = (e) => {
+    if (GM.paused || busy) { GM.speaking = false; GM.chunks = []; return; }
+    const d = new Float32Array(e.inputBuffer.getChannelData(0)); let s2 = 0; for (let i = 0; i < d.length; i++) s2 += d[i] * d[i]; const rms = Math.sqrt(s2 / d.length), now = performance.now();
+    if (!GM.speaking) GM.floor = GM.floor * .97 + rms * .03;
+    const thr = Math.max(0.012, GM.floor * 2.8);
+    if (rms > thr) { if (!GM.speaking) { GM.speaking = true; GM.startT = now; GM.chunks = GM.pre.slice(); if (!capturing) $('qline').textContent = 'שומעת…'; } GM.lastVoice = now; }
+    if (GM.speaking) { GM.chunks.push(d); const len = now - GM.startT; if (now - GM.lastVoice > 900 || len > 25000) { GM.speaking = false; const ch = GM.chunks; GM.chunks = []; if (now - GM.startT - 900 > 350) gemUtterance(ch); else if (!capturing) $('qline').textContent = ''; } }
+    GM.pre.push(d); if (GM.pre.length > 3) GM.pre.shift();
+  };
+}
+function stopGem(){ if (!GM.stream) return; try { GM.proc.disconnect(); GM.src.disconnect(); } catch (e) {} GM.stream.getTracks().forEach((t) => t.stop()); GM.stream = null; GM.speaking = false; GM.chunks = []; }
+function startListen(){ if (hearMode() === 'gemini') startGem(); else startRec(); }
+function stopListen(full){ stopRec(); if (full) stopGem(); else GM.paused = true; }
+function startRec(){
+  if (!SR) { startGem(); return; }
+  if (busy || rec) return;
+  rec = new SR(); rec.lang = 'he-IL'; rec.continuous = true; rec.interimResults = true;
+  rec.onresult = (e) => {
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i], txt = res[0].transcript.trim();
+      if (!res.isFinal) { $('qline').textContent = (capturing || talk ? 'מאיר · ' : 'שומעת · ') + (capBuf + ' ' + txt).trim(); if (capturing) { clearTimeout(capTimer); capTimer = setTimeout(finishCapture, 2500); } continue; }
+      handleFinal(txt, false);
+    }
+  };
+  rec.onerror = (e) => { const M = { 'not-allowed': 'Chrome חוסם את המיקרופון. לחץ על סמל המנעול/המיקרופון בשורת הכתובת ← אפשר מיקרופון.', 'service-not-allowed': 'Chrome חוסם את המיקרופון. לחץ על סמל המנעול/המיקרופון בשורת הכתובת ← אפשר מיקרופון.', 'audio-capture': 'לא נמצא מיקרופון. בדוק בהגדרות המק ← צליל ← קלט.', 'network': 'זיהוי הדיבור של Chrome צריך אינטרנט. בדוק חיבור.' }; if (M[e.error]) toast(M[e.error], 10000); if (e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'audio-capture') { micOn = false; updMic(); } };
+  rec.onend = () => { rec = null; if (micOn && !busy && hearMode() === 'chrome') setTimeout(startRec, 250); };
+  try { rec.start(); } catch (e) { rec = null; }
+}
+function stopRec(){ if (rec) { try { rec.onend = null; rec.abort(); } catch (e) {} rec = null; } }
+function updMic(){ $('micBtn').textContent = micOn ? '🎙️ הקשבה: פועלת' : '🎙️ הקשבה: כבויה'; $('micBtn').classList.toggle('rec', micOn); $('wallBtn').textContent = wall ? 'זבוב על הקיר: פועל' : 'זבוב על הקיר: כבוי'; $('wallBtn').classList.toggle('on', wall); if (!busy) setPhase(restPhase()); }
+$('micBtn').onclick = () => { ac(); micOn = !micOn; if (micOn) { talk = true; startListen(); setLine('אני איתך. דבר חופשי. כשתגיד "סיימנו" אחזור לרקע.'); } else { stopListen(true); wall = false; talk = false; } updMic(); };
+$('wallBtn').onclick = () => { wall = !wall; if (wall && !micOn) { micOn = true; startListen(); } updMic(); if (wall) toast('מתמללת ברקע ושומרת ביומן של היום. מקליטה רק כשהחלון פתוח, ועוצרת כשמכבים.'); };
+$('sumBtn').onclick = () => ask('תני לי סיכום של היום מתוך היומן: מה היה, מה הוחלט, ומה פתוח.');
+
+// ---------- settings ----------
+const F = ['kClaude', 'kGoogle', 'model', 'budget', 'voice', 'ttsModel', 'style', 'niqqud', 'about', 'hear', 'sttModel'];
+function openSet(){ const c = cfg(); F.forEach((f) => { $(f).value = c[f] == null ? '' : c[f]; }); $('settings').classList.add('open'); $('kClaude').focus(); }
+$('setBtn').onclick = openSet; $('closeSet').onclick = () => $('settings').classList.remove('open');
+$('saveSet').onclick = () => { const c = LS.get('cfg', {}); F.forEach((f) => { c[f] = f === 'budget' ? Number($(f).value || 100) : $(f).value.trim(); }); LS.set('cfg', c); voiceOK = null; warnedTTS = false; showCost(); if (micOn) { stopListen(true); startListen(); } $('settings').classList.remove('open'); toast('נשמר'); };
+$('testVoice').onclick = async () => { $('saveSet').click(); ac(); setPhase('speak'); const line = 'שלום מאיר, אני ענת מקבוצת תפר. ככה אני נשמעת.'; setLine(line); const p = await prepareLine(line); if (p.ab) await playBuffer(p.ab); else await speakBrowser(line); setPhase('idle'); if (voiceOK) toast('הקול שעובד: ' + voiceOK); };
+
+// ---------- boot ----------
+if (!DATA_ONLY) {
+  setPhase('off');
+  if (!cfg().kClaude) setTimeout(openSet, 600);
+  else $('qline').textContent = 'לחץ "הקשבה" ותגיד "ענת", או כתוב למטה';
+}
+})();
+</script>
+</body>
+</html>
